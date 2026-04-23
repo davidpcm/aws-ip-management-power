@@ -21,7 +21,7 @@ Multi-account AWS IP address management MCP server for Kiro. Scan VPCs, subnets,
 
 1. Open Kiro → Powers panel → **Add Custom Power**
 2. Select **Git Repository**
-3. Paste: `https://github.com/davidpcm/certis-ip-management-power`
+3. Paste: `https://github.com/davidpcm/aws-ip-management-power`
 4. Edit `mcp.json` — replace `PLACEHOLDER_SERVER_PATH` with the local path to this repo
 5. Update `AWS_PROFILE` and `AWS_REGION` to match your environment
 
