@@ -159,19 +159,52 @@ def _scan_account(profile, region):
     return result
 
 
+DEFAULT_REGIONS = ["ap-southeast-1", "ap-southeast-2", "us-east-1"]
+
+
 def _scan_all(profiles_str, region):
     profiles = _parse_profiles(profiles_str)
-    region = region or os.environ.get("AWS_REGION", "ap-southeast-1")
-    results = []
-    with ThreadPoolExecutor(max_workers=5) as ex:
-        futs = {ex.submit(_scan_account, p, region): p for p in profiles}
-        for f in as_completed(futs):
+    if region:
+        regions = [region]
+    else:
+        regions = DEFAULT_REGIONS
+
+    results_by_profile = {}
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futs = {}
+        for p in profiles:
+            session = None
             try:
-                results.append(f.result())
+                session = boto3.Session(profile_name=p, region_name=regions[0])
+                session.client("sts").get_caller_identity()
+            except Exception:
+                info = _get_all_profiles().get(p, {})
+                results_by_profile[p] = {"profile": p, "account_name": info.get("name", p),
+                    "account_id": info.get("account_id", "unknown"), "region": ",".join(regions),
+                    "vpcs": [], "eips": [], "enis": [], "errors": ["Auth failed - run: aws sso login --profile " + p]}
+                continue
+            for r in regions:
+                futs[ex.submit(_scan_account, p, r)] = (p, r)
+
+        for f in as_completed(futs):
+            p, r = futs[f]
+            try:
+                res = f.result()
             except Exception as e:
-                results.append({"profile": futs[f], "account_name": futs[f], "account_id": "error",
-                    "region": region, "vpcs": [], "eips": [], "enis": [], "errors": [str(e)]})
-    return sorted(results, key=lambda r: r["account_name"])
+                res = {"profile": p, "account_name": p, "account_id": "error",
+                    "region": r, "vpcs": [], "eips": [], "enis": [], "errors": [str(e)]}
+            if p not in results_by_profile:
+                results_by_profile[p] = res
+            else:
+                existing = results_by_profile[p]
+                existing["vpcs"].extend(res.get("vpcs", []))
+                existing["eips"].extend(res.get("eips", []))
+                existing["enis"].extend(res.get("enis", []))
+                existing["errors"].extend(res.get("errors", []))
+                if r not in existing.get("region", ""):
+                    existing["region"] = existing.get("region", "") + "," + r
+
+    return sorted(results_by_profile.values(), key=lambda r: r["account_name"])
 
 
 # ─── MCP Tools ────────────────────────────────────────────────────────────────
