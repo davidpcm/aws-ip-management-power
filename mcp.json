@@ -2,7 +2,7 @@
   "mcpServers": {
     "aws-ip-management": {
       "command": "uv",
-      "args": ["run", "--with", "fastmcp", "--with", "boto3", "fastmcp", "run", "PLACEHOLDER_SERVER_PATH/server.py"],
+      "args": ["run", "--with", "mcp[cli]", "--with", "boto3", "python", "PLACEHOLDER_SERVER_PATH/server.py"],
       "env": {
         "AWS_PROFILE": "sandbox4",
         "AWS_REGION": "ap-southeast-1"
