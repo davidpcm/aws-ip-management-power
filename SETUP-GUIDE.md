@@ -71,7 +71,7 @@ The power needs to know where `server.py` lives on your machine.
   "mcpServers": {
     "aws-ip-management": {
       "command": "uv",
-      "args": ["run", "--with", "fastmcp", "--with", "boto3", "fastmcp", "run", "PLACEHOLDER_SERVER_PATH/server.py"],
+      "args": ["run", "--with", "mcp[cli]", "--with", "boto3", "python", "PLACEHOLDER_SERVER_PATH/server.py"],
       "env": {
         "AWS_PROFILE": "sandbox4",
         "AWS_REGION": "ap-southeast-1"
@@ -87,7 +87,7 @@ The power needs to know where `server.py` lives on your machine.
   "mcpServers": {
     "aws-ip-management": {
       "command": "uv",
-      "args": ["run", "--with", "fastmcp", "--with", "boto3", "fastmcp", "run", "C:/Users/JohnDoe/.kiro/powers/aws-ip-management-power/server.py"],
+      "args": ["run", "--with", "mcp[cli]", "--with", "boto3", "python", "C:/Users/JohnDoe/.kiro/powers/aws-ip-management-power/server.py"],
       "env": {
         "AWS_PROFILE": "my-prod",
         "AWS_REGION": "ap-southeast-1"
@@ -233,7 +233,7 @@ Your IAM role lacks the required permissions. The role needs:
 3. Check the path uses forward slashes (`/`) even on Windows
 4. Try running manually to see errors:
    ```bash
-   uv run --with fastmcp --with boto3 fastmcp run /path/to/server.py
+   uv run --with "mcp[cli]" --with boto3 python /path/to/server.py
    ```
 
 ### No tools showing in Kiro
