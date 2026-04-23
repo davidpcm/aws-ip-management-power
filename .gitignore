@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+ip-tracking-db.json
+accounts-registry.json
+scan-data.json
+*.html
